@@ -38,8 +38,8 @@ copy1:
 	sub cx, 1				;копируем в индексы 3,2,1,0
 	mov di, cx
 	add cx, 2				;нам нужно скопировать символы с индексами 5,4,3,2
-							;так как первые 2 - max, len
-	mov si, cx
+	mov si, cx				;так как первые 2 - max, len
+	
 	mov ah, STRING[si]
 	mov STR_PART[di], ah
 	sub cx, 1
