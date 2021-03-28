@@ -8,13 +8,13 @@ PUBLIC TO_SD						; перевод числа в знаковое в 10 с/с
 
 DATASEG SEGMENT PARA PUBLIC 'DATA'
     UB DB 16 DUP('$'), '$'
-    SD DB ' ', 5 DUP('0'), '$'
+    SD DB ' ', 5 DUP('$'), '$'
 DATASEG ENDS
 
 CODESEG SEGMENT PARA PUBLIC 'CODE'
     ASSUME CS:CODESEG, DS:DATASEG
 
-TO_UB PROC NEAR
+TO_UB PROC NEAR			; перевод числа в беззнаковое в 2 с/с
     MOV AX, NUMBER		; число записано в AX
     MOV DI, 15			; начинаем заполнять строку с конца	
     LOOP_UB:
@@ -30,10 +30,18 @@ TO_UB PROC NEAR
     RET
 TO_UB ENDP
 
-TO_SD PROC NEAR
+TO_SD PROC NEAR						; перевод числа в знаковое в 10 с/с
+		MOV CX, 5					; обнуление предыдущего результата
+		MOV SD[0], ' '
+	MAKE_NULL:
+		MOV DI, CX
+		MOV SD[DI], '$'				
+		LOOP MAKE_NULL
+
 		MOV DI, 5					; максимальное количество цифр
 		MOV AX, NUMBER				; число записано в AX
 		;BT  AX, 15					; извлечение заданного бита в флаг cf
+									; находим знак
 		MOV BX, 32768				; 2 в 15
 		AND BX, AX
 		CMP BX, 0
@@ -42,25 +50,26 @@ TO_SD PROC NEAR
 		SUB AX, 32768
 		MOV SD[0], '-'
 		
-	
-	COUNT_DIGITS:
+	COUNT_DIGITS:					; подсчет цифр
 		CMP AX, 10000
-		JA START_SD
+		JNB START_SD
 		DEC DI
 		CMP AX, 1000
-		JA START_SD
+		JNB START_SD
 		DEC DI
 		CMP AX, 100
-		JA START_SD
+		JNB START_SD
 		DEC DI
 		CMP AX, 10
-		JA START_SD
+		JNB START_SD
 		DEC DI
 		CMP AX, 1
-		JA START_SD
-		DEC DI
+		JNB START_SD
+		; если 0
+		MOV SD[1], '0'
+		RET
 		
-	START_SD:	
+	START_SD:					; перевод числа
 		MOV CX, DI
 		MOV BX, 10
 		LOOP_SD:
@@ -68,7 +77,9 @@ TO_SD PROC NEAR
 ; если делитель размером в слово, то делимое должно быть расположено в паре регистров dx:ax, 
 ; причем младшая часть делимого находится в ax. После операции частное помещается в ax, а остаток — в dx;
 			DIV BX
-			MOV SD[DI], DL
+			MOV SD[DI], DL		; остаток от деления на 10
+			ADD SD[DI], '0'
+			DEC DI
 			LOOP LOOP_SD
     RET
 TO_SD ENDP

@@ -1,3 +1,4 @@
+; беззнаковое в 16 с/с  			беззнаковое в 2 с/с 				знаковое в 10 с/с
 EXTRN INPUT_CMD: NEAR				; ввод номера команды в регистр SI
 EXTRN INPUT_UH: NEAR				; ввод беззнакового в 16 с/c
 
@@ -6,18 +7,18 @@ EXTRN OUTPUT_SD: NEAR				; вывод знакового в 10 с/с
 EXTRN NEW_STR: NEAR					; возврат картеки и перевод на новую строку
 
 DATASEG SEGMENT PARA PUBLIC 'DATA'
-    MENU DB 'Available actions:', 13, 10, 10
-         DB '1. Input unsigned hexadecimal number;', 13, 10
-         DB '2. Convert to unsigned binary number;', 13, 10
-         DB '3. Convert to signed decimal number;', 13, 10, 10
-         DB '0. Exit program.', 13, 10, 10
-         DB 'Choose action: $'
-    ACTIONS DW  EXIT, INPUT_UH, OUTPUT_UB, OUTPUT_SD
+    MENU DB 'Available commands:', 13, 10, 10
+         DB '1. Input unsigned hexadecimal number', 13, 10
+         DB '2. Convert to unsigned binary number', 13, 10
+         DB '3. Convert to signed decimal number', 13, 10, 10
+         DB '0. Quit program.', 13, 10, 10
+         DB 'Choose command: $'
+    COMMANDS DW  EXIT, INPUT_UH, OUTPUT_UB, OUTPUT_SD
 DATASEG ENDS
 
 
 STACKSEG SEGMENT PARA STACK 'STACK'
-    DB 200H DUP(0)
+    DB 100H DUP(?)
 STACKSEG ENDS
 
 CODESEG SEGMENT PARA PUBLIC 'CODE'
@@ -43,7 +44,7 @@ MAIN:
         CALL OUTPUT_MENU
         CALL INPUT_CMD
         CALL NEW_STR
-        CALL ACTIONS[SI]
+        CALL COMMANDS[SI]
         JMP MAINLOOP
 
 CODESEG ENDS
