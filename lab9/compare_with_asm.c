@@ -135,11 +135,80 @@ void measure_80(void)
     printf("MULT: %.3e sec\n\n", ((float)(end - begin)) / (CLOCKS_PER_SEC));
 }
 
+void cmp_sin(void)
+{
+    printf("Comparing accuracy of sin calcullations:\n");
+    double pi1 = 3.14, pi2 = 3.141596;
+    double counted_sin1, counted_sin2, counted_sin3;
+
+    asm("fld %1\n"
+        "fsin\n"
+        "fstp %0\n"
+        : "=m"(counted_sin1)
+        : "m"(pi1));
+
+    asm("fld %1\n"
+        "fsin\n"
+        "fstp %0\n"
+        : "=m"(counted_sin2)
+        : "m"(pi2));
+
+    asm("fldpi\n"
+        "fsin\n"
+        "fstp %0\n"
+        : "=m"(counted_sin3));
+
+
+    printf("Sin(pi): \nsin(3.14)=    %e, \nsin(3.141596)=%e, \nsin(pi)=      %e\n\n", counted_sin1, counted_sin2, counted_sin3);
+}
+
+void cmp_sin2(void)
+{
+    double pi1 = 3.14, pi2 = 3.141596;
+    double counted_sin1, counted_sin2, counted_sin3;
+
+    asm("fld %1\n"
+        "fld1\n"
+        "fld1\n"
+        "faddp\n"
+        "fdivp\n"
+        "fsin\n"
+        "fstp %0\n"
+        : "=m"(counted_sin1)
+        : "m"(pi1));
+
+
+    asm("fld %1\n"
+        "fld1\n"
+        "fld1\n"
+        "faddp\n"
+        "fdivp\n"
+        "fsin\n"
+        "fstp %0\n"
+        : "=m"(counted_sin2)
+        : "m"(pi2));
+
+    asm("fldpi\n"
+        "fld1\n"
+        "fld1\n"
+        "faddp\n"
+        "fdiv\n"
+        "fsin\n"
+        "fstp %0\n"
+        : "=m"(counted_sin3));
+
+    printf("Sin(pi/2): \nsin(3.14/2)=    %e, \nsin(3.141596/2)=%e, \nsin(pi/2)=      %e\n\n", counted_sin1, counted_sin2, counted_sin3);
+    
+}
+
 int main(void)
 {
     printf("Everything is measured for %d repeats\n", N_REPEATS);
     measure_32();
     measure_64();
     measure_80();
+
+    cmp_sin();
+    cmp_sin2();
     return 0;
 }
