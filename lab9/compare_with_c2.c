@@ -1,8 +1,4 @@
-
-#include <limits.h>
-#include <time.h>
-#include <stdio.h>
-#define N_REPEATS 1000000
+#include "main_header.h"
 
 void sum_32(float a, float b)
 {

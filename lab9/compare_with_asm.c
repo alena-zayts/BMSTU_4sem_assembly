@@ -1,14 +1,11 @@
-#include <limits.h>
-#include <time.h>
-#include <stdio.h>
-#define N_REPEATS 1000000
+#include "main_header.h"
 
 void sum_32(float a, float b)
 {
     float c;
 
     for (size_t i = 0; i < N_REPEATS; i++)
-        asm("fld %1\n"    //помещает содержимое источника (32-, 64- или 80-битная переменная) в стек FPU 
+        asm volatile("fld %1\n"    //помещает содержимое источника (32-, 64- или 80-битная переменная) в стек FPU 
             "fld %2\n"
             "faddp\n"   //Сложение с выталкиванием из стека ST(0) (результат в ST(i)
             "fstp %0\n" //Считать вещественное число из стека с выталкиванием
@@ -21,7 +18,7 @@ void mult_32(float a, float b)
     float c;
 
     for (size_t i = 0; i < N_REPEATS; i++)
-        asm("fld %1\n"
+        asm volatile("fld %1\n"
             "fld %2\n"
             "fmulp\n"        //Умножение с выталкиванием из стека ST(0) (результат в ST(i)
             "fstp %0\n"
@@ -53,7 +50,7 @@ void sum_64(double a, double b)
     double c;
 
     for (size_t i = 0; i < N_REPEATS; i++)
-        asm("fld %1\n"
+        asm volatile("fld %1\n"
             "fld %2\n"
             "faddp\n"
             "fstp %0\n"
@@ -66,7 +63,7 @@ void mult_64(double a, double b)
     double c;
 
     for (size_t i = 0; i < N_REPEATS; i++)
-        asm("fld %1\n"
+        asm volatile("fld %1\n"
             "fld %2\n"
             "fmulp\n"
             "fstp %0\n"
@@ -97,7 +94,7 @@ void sum_80(__float80 a, __float80 b)
     __float80 c;
 
     for (size_t i = 0; i < N_REPEATS; i++)
-        asm("fld %1\n"
+        asm volatile("fld %1\n"
             "fld %2\n"
             "faddp\n"
             "fstp %0\n"
@@ -110,7 +107,7 @@ void mult_80(__float80 a, __float80 b)
     __float80 c;
 
     for (size_t i = 0; i < N_REPEATS; ++i)
-        asm("fld %1\n"
+        asm volatile("fld %1\n"
             "fld %2\n"
             "fmulp\n"
             "fstp %0\n"
@@ -141,19 +138,19 @@ void cmp_sin(void)
     double pi1 = 3.14, pi2 = 3.141596;
     double counted_sin1, counted_sin2, counted_sin3;
 
-    asm("fld %1\n"
+    asm volatile("fld %1\n"
         "fsin\n"
         "fstp %0\n"
         : "=m"(counted_sin1)
         : "m"(pi1));
 
-    asm("fld %1\n"
+    asm volatile("fld %1\n"
         "fsin\n"
         "fstp %0\n"
         : "=m"(counted_sin2)
         : "m"(pi2));
 
-    asm("fldpi\n"
+    asm volatile("fldpi\n"
         "fsin\n"
         "fstp %0\n"
         : "=m"(counted_sin3));
@@ -167,7 +164,7 @@ void cmp_sin2(void)
     double pi1 = 3.14, pi2 = 3.141596;
     double counted_sin1, counted_sin2, counted_sin3;
 
-    asm("fld %1\n"
+    asm volatile("fld %1\n"
         "fld1\n"
         "fld1\n"
         "faddp\n"
@@ -178,7 +175,7 @@ void cmp_sin2(void)
         : "m"(pi1));
 
 
-    asm("fld %1\n"
+    asm volatile("fld %1\n"
         "fld1\n"
         "fld1\n"
         "faddp\n"
@@ -188,7 +185,7 @@ void cmp_sin2(void)
         : "=m"(counted_sin2)
         : "m"(pi2));
 
-    asm("fldpi\n"
+    asm volatile("fldpi\n"
         "fld1\n"
         "fld1\n"
         "faddp\n"
